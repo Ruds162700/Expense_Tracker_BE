@@ -90,7 +90,7 @@ exports.register = async (req, res) => {
         return res.status(200).json({
             status: true,
             message: "User registered successfully. OTP sent.",
-            verify_token:verify_token
+            verify_token: verify_token
         });
     } catch (error) {
         console.error("Registration error:", error);
@@ -156,7 +156,7 @@ exports.login = async (req, res) => {
             return res.status(406).json({
                 status: false,
                 message: "User not verified.",
-                verify_token:verify_token,
+                verify_token: verify_token,
             });
         }
         const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, {
@@ -187,7 +187,7 @@ exports.verifyOTP = async (req, res) => {
 
         // Get verify_token from Authorization header
         const verify_token = req.headers.authorization?.split(" ")[1];  // Extract token after "Bearer "
-        
+
         if (!verify_token) {
             return res.status(401).json({
                 status: false,
@@ -246,7 +246,7 @@ exports.resendOTP = async (req, res) => {
     try {
         // Retrieve the verify_token from the Authorization header
         const verifyToken = req.headers.authorization && req.headers.authorization.split(" ")[1]; // Extract token from 'Bearer <token>'
-        
+
         if (!verifyToken) {
             return res.status(406).json({
                 status: false,
@@ -256,7 +256,7 @@ exports.resendOTP = async (req, res) => {
 
         // Query user based on the verify_token
         const user = await pool.query("SELECT * FROM user_table WHERE user_otp_token = $1", [verifyToken]);
-        
+
         if (!user.rows[0]) {
             return res.status(401).json({
                 status: false,
@@ -266,7 +266,7 @@ exports.resendOTP = async (req, res) => {
 
         // Generate new OTP
         const otp = OTPGenerator();
-        
+
         // Update OTP in the database
         await pool.query(
             "UPDATE user_table SET user_otp = $1, user_otp_time = $2 WHERE user_otp_token = $3",
@@ -351,7 +351,7 @@ exports.addPassword = async (req, res) => {
         return res.status(200).json({
             status: true,
             message: "OTP sent successfully.",
-            verify_token:verify_token
+            verify_token: verify_token
         });
     } catch (error) {
         console.error("Login error:", error);
@@ -370,7 +370,7 @@ exports.checkAndAddPass = async (req, res) => {
 
         // Retrieve the verify_token from the Authorization header
         const verifyToken = req.headers.authorization && req.headers.authorization.split(" ")[1]; // Extract token from 'Bearer <token>'
-        
+
         if (!verifyToken) {
             return res.status(401).json({
                 status: false,
@@ -432,9 +432,9 @@ exports.checkAndAddPass = async (req, res) => {
 };
 
 
-const clientID = '278212426766-1c3eiva073kk4re08os3uutsu6fh27o5.apps.googleusercontent.com';
-const clientSecret = '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';
-const redirect_uri = "https://965f-182-70-123-229.ngrok-free.app/api/auth/google/callback";
+const clientID = process.env.GOOGLE_CLIENT_ID;
+const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const redirect_uri = process.env.GOOGLE_REDIRECT_URI;
 
 exports.googleAuth = (req, res) => {
     try {
