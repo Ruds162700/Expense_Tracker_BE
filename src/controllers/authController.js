@@ -1,5 +1,5 @@
 const pool = require("../config/db");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
 const nodemailer = require('nodemailer');
